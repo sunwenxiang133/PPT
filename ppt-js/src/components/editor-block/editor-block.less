@@ -1,0 +1,18 @@
+.editor-block {
+  position: absolute;
+  //用伪类，防止按钮被点击
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.editor-block-focus {
+  &::after {
+    border: 3px dashed red;
+  }
+}
