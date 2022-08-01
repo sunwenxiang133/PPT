@@ -2,6 +2,8 @@ import {computed, defineComponent, ref} from "vue";
 import "./Layout.less"
 import EditorBlock from "@/components/editor-block/editor-block";
 import EditorLeft from "@/views/editor-left/editor-left";
+import {useFocus} from "@/layout/Layout/useFocus";
+import {useBlockDragger} from "@/layout/Layout/useBlockDragger";
 
 export class dataType {
     container!: {
@@ -45,30 +47,15 @@ export default defineComponent({
 
         const containerRef = ref(null);
 
+        //实现获取焦点，选中后可能直接就进行拖拽了
+        let {blockMousedown, focusData, containerMousedown} = useFocus(data, props, (e: any) => {
+            console.log(focusData.value.focus);
+            mousedown(e) //这里面是回调，回调一定是在这个文件里面的代码之后再被执行的
+        });
+
         //实现拖拽多个元素的功能
-        const clearBlockFocus = () => {
-            props.modelValue?.blocks.forEach(block => block.focus = false);
-        }
+        let {mousedown} = useBlockDragger(focusData);
 
-        function blockMousedown(e: any, block: { top: number; left: number; zIndex: number; key: string; focus?: boolean }) {
-            e.preventDefault();
-            e.stopPropagation();
-            //block上规划一个属性focus,获取焦点后就将focus变为true
-            if (e.shiftKey) {
-                block.focus = !block.focus;
-            } else {
-                if (!block.focus) {
-                    clearBlockFocus();
-                    block.focus = true;
-                } else {
-                    block.focus = false;
-                }
-            }
-        }
-
-        const containerMousedown = () => {
-            clearBlockFocus();
-        }
 
         return () => <div class="editor">
             {/*v-bind不行，因为当时没有，但是v-model可以，因为渲染完会回到原来的界面*/}
